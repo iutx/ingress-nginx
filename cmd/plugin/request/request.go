@@ -30,6 +30,7 @@ import (
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	discoveryv1beta1client "k8s.io/client-go/kubernetes/typed/discovery/v1beta1"
 	typednetworking "k8s.io/client-go/kubernetes/typed/networking/v1"
+	"k8s.io/klog/v2"
 
 	"k8s.io/ingress-nginx/cmd/plugin/util"
 )
@@ -198,8 +199,10 @@ func getEndpointSlices(flags *genericclioptions.ConfigFlags, namespace string) (
 	if err != nil {
 		return nil, err
 	}
+	klog.Info("viper: created discovery v1beta1 client")
 	endpointSlicesList, err := api.EndpointSlices(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
+		klog.Error("viper: can't list EndpointSlices")
 		return nil, err
 	}
 	endpointSlices := endpointSlicesList.Items
