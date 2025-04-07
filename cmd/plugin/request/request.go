@@ -22,13 +22,13 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
-	discoveryv1 "k8s.io/api/discovery/v1"
+	discoveryv1beta1 "k8s.io/api/discovery/v1beta1"
 	networking "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	discoveryv1client "k8s.io/client-go/kubernetes/typed/discovery/v1"
+	discoveryv1beta1client "k8s.io/client-go/kubernetes/typed/discovery/v1"
 	typednetworking "k8s.io/client-go/kubernetes/typed/networking/v1"
 
 	"k8s.io/ingress-nginx/cmd/plugin/util"
@@ -153,14 +153,14 @@ func GetNumEndpoints(flags *genericclioptions.ConfigFlags, namespace, serviceNam
 }
 
 // GetEndpointSlicesByName returns the endpointSlices for the service with the given name
-func GetEndpointSlicesByName(flags *genericclioptions.ConfigFlags, namespace, name string) ([]discoveryv1.EndpointSlice, error) {
+func GetEndpointSlicesByName(flags *genericclioptions.ConfigFlags, namespace, name string) ([]discoveryv1beta1.EndpointSlice, error) {
 	allEndpointsSlices, err := getEndpointSlices(flags, namespace)
 	if err != nil {
 		return nil, err
 	}
-	var eps []discoveryv1.EndpointSlice
+	var eps []discoveryv1beta1.EndpointSlice
 	for i := range allEndpointsSlices {
-		if svcName, ok := allEndpointsSlices[i].ObjectMeta.GetLabels()[discoveryv1.LabelServiceName]; ok {
+		if svcName, ok := allEndpointsSlices[i].ObjectMeta.GetLabels()[discoveryv1beta1.LabelServiceName]; ok {
 			if svcName == name {
 				eps = append(eps, allEndpointsSlices[i])
 			}
@@ -170,9 +170,9 @@ func GetEndpointSlicesByName(flags *genericclioptions.ConfigFlags, namespace, na
 	return eps, nil
 }
 
-var endpointSlicesCache = make(map[string]*[]discoveryv1.EndpointSlice)
+var endpointSlicesCache = make(map[string]*[]discoveryv1beta1.EndpointSlice)
 
-func getEndpointSlices(flags *genericclioptions.ConfigFlags, namespace string) ([]discoveryv1.EndpointSlice, error) {
+func getEndpointSlices(flags *genericclioptions.ConfigFlags, namespace string) ([]discoveryv1beta1.EndpointSlice, error) {
 	cachedEndpointSlices, ok := endpointSlicesCache[namespace]
 
 	if ok {
@@ -194,7 +194,7 @@ func getEndpointSlices(flags *genericclioptions.ConfigFlags, namespace string) (
 		return nil, err
 	}
 
-	api, err := discoveryv1client.NewForConfig(rawConfig)
+	api, err := discoveryv1beta1client.NewForConfig(rawConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -218,10 +218,10 @@ func tryAllNamespacesEndpointSlicesCache(flags *genericclioptions.ConfigFlags) {
 	}
 }
 
-func tryFilteringEndpointSlicesFromAllNamespacesCache(namespace string) *[]discoveryv1.EndpointSlice {
+func tryFilteringEndpointSlicesFromAllNamespacesCache(namespace string) *[]discoveryv1beta1.EndpointSlice {
 	allEndpointSlices := endpointSlicesCache[""]
 	if allEndpointSlices != nil {
-		endpointSlices := make([]discoveryv1.EndpointSlice, 0)
+		endpointSlices := make([]discoveryv1beta1.EndpointSlice, 0)
 		for i := range *allEndpointSlices {
 			if (*allEndpointSlices)[i].Namespace == namespace {
 				endpointSlices = append(endpointSlices, (*allEndpointSlices)[i])

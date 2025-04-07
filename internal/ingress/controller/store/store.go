@@ -29,7 +29,7 @@ import (
 
 	"github.com/eapache/channels"
 	corev1 "k8s.io/api/core/v1"
-	discoveryv1 "k8s.io/api/discovery/v1"
+	discoveryv1beta1 "k8s.io/api/discovery/v1beta1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -82,7 +82,7 @@ type Storer interface {
 	GetService(key string) (*corev1.Service, error)
 
 	// GetServiceEndpointsSlices returns the EndpointSlices of a Service matching key.
-	GetServiceEndpointsSlices(key string) ([]*discoveryv1.EndpointSlice, error)
+	GetServiceEndpointsSlices(key string) ([]*discoveryv1beta1.EndpointSlice, error)
 
 	// ListIngresses returns a list of all Ingresses in the store.
 	ListIngresses() []*ingress.Ingress
@@ -716,11 +716,11 @@ func New(
 			}
 		},
 		UpdateFunc: func(old, cur interface{}) {
-			oeps, ok := old.(*discoveryv1.EndpointSlice)
+			oeps, ok := old.(*discoveryv1beta1.EndpointSlice)
 			if !ok {
 				klog.Errorf("unexpected type: %T", old)
 			}
-			ceps, ok := cur.(*discoveryv1.EndpointSlice)
+			ceps, ok := cur.(*discoveryv1beta1.EndpointSlice)
 			if !ok {
 				klog.Errorf("unexpected type: %T", cur)
 			}
@@ -1125,7 +1125,7 @@ func (s *k8sStore) GetConfigMap(key string) (*corev1.ConfigMap, error) {
 	return s.listers.ConfigMap.ByKey(key)
 }
 
-func (s *k8sStore) GetServiceEndpointsSlices(key string) ([]*discoveryv1.EndpointSlice, error) {
+func (s *k8sStore) GetServiceEndpointsSlices(key string) ([]*discoveryv1beta1.EndpointSlice, error) {
 	return s.listers.EndpointSlice.MatchByKey(key)
 }
 

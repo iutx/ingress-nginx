@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"strings"
 
-	discoveryv1 "k8s.io/api/discovery/v1"
+	discoveryv1beta1 "k8s.io/api/discovery/v1beta1"
 	apiNames "k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/client-go/tools/cache"
 )
@@ -31,8 +31,8 @@ type EndpointSliceLister struct {
 }
 
 // MatchByKey returns the EndpointsSlices of the Service matching key in the local Endpoint Store.
-func (s *EndpointSliceLister) MatchByKey(key string) ([]*discoveryv1.EndpointSlice, error) {
-	var eps []*discoveryv1.EndpointSlice
+func (s *EndpointSliceLister) MatchByKey(key string) ([]*discoveryv1beta1.EndpointSlice, error) {
+	var eps []*discoveryv1beta1.EndpointSlice
 	keyNsLen := strings.Index(key, "/")
 	if keyNsLen < -1 {
 		keyNsLen = 0
@@ -53,10 +53,10 @@ func (s *EndpointSliceLister) MatchByKey(key string) ([]*discoveryv1.EndpointSli
 		epss, exists, err := s.GetByKey(listKey)
 		if exists && err == nil {
 			// check for svc owner label
-			if svcName, ok := epss.(*discoveryv1.EndpointSlice).ObjectMeta.GetLabels()[discoveryv1.LabelServiceName]; ok {
-				namespace := epss.(*discoveryv1.EndpointSlice).ObjectMeta.GetNamespace()
+			if svcName, ok := epss.(*discoveryv1beta1.EndpointSlice).ObjectMeta.GetLabels()[discoveryv1beta1.LabelServiceName]; ok {
+				namespace := epss.(*discoveryv1beta1.EndpointSlice).ObjectMeta.GetNamespace()
 				if key == fmt.Sprintf("%s/%s", namespace, svcName) {
-					eps = append(eps, epss.(*discoveryv1.EndpointSlice))
+					eps = append(eps, epss.(*discoveryv1beta1.EndpointSlice))
 				}
 			}
 		}
