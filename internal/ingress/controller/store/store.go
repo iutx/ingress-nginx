@@ -337,7 +337,7 @@ func New(
 		store.listers.IngressClass.Store = cache.NewStore(cache.MetaNamespaceKeyFunc)
 	}
 
-	store.informers.EndpointSlice = infFactory.Discovery().V1().EndpointSlices().Informer()
+	store.informers.EndpointSlice = infFactory.Discovery().V1beta1().EndpointSlices().Informer()
 	store.listers.EndpointSlice.Store = store.informers.EndpointSlice.GetStore()
 
 	store.informers.Secret = infFactorySecrets.Core().V1().Secrets().Informer()
