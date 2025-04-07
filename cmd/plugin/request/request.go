@@ -28,7 +28,7 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	discoveryv1beta1client "k8s.io/client-go/kubernetes/typed/discovery/v1"
+	discoveryv1beta1client "k8s.io/client-go/kubernetes/typed/discovery/v1beta1"
 	typednetworking "k8s.io/client-go/kubernetes/typed/networking/v1"
 
 	"k8s.io/ingress-nginx/cmd/plugin/util"
